@@ -1,0 +1,34 @@
+name: Daily Career Coach
+
+on:
+  schedule:
+    # Runs every day at 07:30 UTC
+    - cron: "30 7 * * *"
+  workflow_dispatch:
+    # Allow manual triggers from the Actions tab
+
+jobs:
+  run-daily-coach:
+    name: Run Daily Career Coach
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Daily Career Coach
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_DELEGATED_USER: ${{ secrets.GOOGLE_DELEGATED_USER }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CONFIG_SHEET_ID: ${{ secrets.CONFIG_SHEET_ID }}
+        run: python -m src.main
