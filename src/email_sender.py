@@ -35,7 +35,10 @@ def send_coach_email(
         ai_content: The AI-generated action plan text.
         availability: Today's free-time summary for the email header.
     """
-    today = datetime.date.today().strftime("%A, %B %-d, %Y")
+    today_raw = datetime.date.today()
+    today = today_raw.strftime("%A, %B {day}, %Y").replace(
+        "{day}", str(today_raw.day)
+    )
     subject = f"🚀 Your Daily Career Coach: {today}"
     html_body = _build_html_body(ai_content, availability, today)
     plain_body = _build_plain_body(ai_content, availability)

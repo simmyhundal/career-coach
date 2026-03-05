@@ -11,6 +11,8 @@ jobs:
   run-daily-coach:
     name: Run Daily Career Coach
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository

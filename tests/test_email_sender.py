@@ -17,6 +17,12 @@ from src.email_sender import (
 from src.calendar_client import Availability
 
 
+def _decode_base64url(s: str) -> bytes:
+    """Decode a base64url string, adding the correct amount of padding."""
+    padding = (4 - len(s) % 4) % 4
+    return base64.urlsafe_b64decode(s + "=" * padding)
+
+
 @pytest.fixture
 def availability():
     return Availability(total_minutes=300, largest_block=120)
@@ -75,7 +81,7 @@ class TestBuildMimeMessage:
             plain_body="Hello",
         )
         # Should be a valid base64url string
-        decoded = base64.urlsafe_b64decode(raw + "==")
+        decoded = _decode_base64url(raw)
         assert len(decoded) > 0
 
     def test_decoded_message_has_correct_headers(self):
@@ -86,7 +92,7 @@ class TestBuildMimeMessage:
             html_body="<p>Hello</p>",
             plain_body="Hello",
         )
-        decoded_bytes = base64.urlsafe_b64decode(raw + "==")
+        decoded_bytes = _decode_base64url(raw)
         msg = email.message_from_bytes(decoded_bytes)
         assert msg["From"] == "sender@example.com"
         assert msg["To"] == "recipient@example.com"
@@ -99,7 +105,7 @@ class TestBuildMimeMessage:
             html_body="<p>Hi</p>",
             plain_body="Hi",
         )
-        decoded_bytes = base64.urlsafe_b64decode(raw + "==")
+        decoded_bytes = _decode_base64url(raw)
         msg = email.message_from_bytes(decoded_bytes)
         assert msg.get_content_type() == "multipart/alternative"
         parts = msg.get_payload()
